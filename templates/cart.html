@@ -3,6 +3,10 @@
 
 {% block body %}
 
+    {% if session['cart']=={} %}
+    <p>Your cart is empty! Order some melons!</p>
+
+    {% else %}
     <table class="table table-striped">
         <thead>
         <tr>
@@ -15,17 +19,20 @@
         <tbody>
         {% for i in range(melon_attributes|length) %}
         <tr>
-            <td>{{melon_attributes[i][0]}}</td>
-            <td>{{melon_attributes[i][2]}}</td>
-            <td>${{melon_attributes[i][1]}}</td>
-            <td>${{melon_attributes[i][2] * melon_attributes[i][1]}} </td>
+            <td>{{ melon_attributes[i][0] }}</td>
+            <td>{{ melon_attributes[i][2] }}</td>
+            <td>${{ '%0.2f' | format(melon_attributes[i][1]|float) }}</td>
+            <td>${{ '%0.2f' | format((melon_attributes[i][2] * melon_attributes[i][1])|float) }} </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <h3>Total: ${{total_cost}}</h3>
+    <h3>Total: ${{ '%0.2f' | format(total_cost|float) }}</h3>
 
     <a href="/checkout" class="btn btn-large btn-primary">Check Out</a>
+{% endif %}
+
 
 {% endblock %}
+

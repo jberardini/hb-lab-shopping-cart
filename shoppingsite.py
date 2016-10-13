@@ -38,6 +38,7 @@ def index():
 def list_melons():
     """Return page showing all the melons ubermelon has to offer"""
 
+    session["cart"] = {}
     melon_list = melons.get_all()
     return render_template("all_melons.html",
                            melon_list=melon_list)
@@ -81,12 +82,15 @@ def show_shopping_cart():
     melon_attributes = []
     total_cost = 0
 
-    for melon, quantity in session["cart"].items():
-        attributes = melons.get_by_id(melon)
-        melon_attributes.append([attributes.common_name, attributes.price, quantity])
-        total_cost += quantity * float(attributes.price)
+    if session["cart"] != {}:
+        for melon, quantity in session["cart"].items():
+            attributes = melons.get_by_id(melon)
+            melon_attributes.append([attributes.common_name, attributes.price, quantity])
+            total_cost += quantity * float(attributes.price)
 
-    return render_template("cart.html", melon_attributes = melon_attributes, total_cost=total_cost)
+    return render_template("cart.html", 
+                           melon_attributes = melon_attributes, 
+                           total_cost=total_cost)
 
 
 @app.route("/add_to_cart/<melon_id>")
@@ -108,12 +112,11 @@ def add_to_cart(melon_id):
     # - flash a success message
     # - redirect the user to the cart page
 
-    # cart exists in session, so we're adding an additional melon to cart
-    if "cart" in session:
+    if melon_id in session["cart"]:
         session["cart"][melon_id] = session["cart"].get(melon_id, 0) + 1
-    # otherwise, nothing added to cart yet, so we need to create cart
     else:
-        session["cart"] = {melon_id: 1}
+        session["cart"][melon_id] = 1
+
 
     print session
     flash("{} added to cart".format(melon_id))
